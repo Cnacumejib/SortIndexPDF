@@ -45,28 +45,32 @@ namespace SortIndex
                 if (myNewFiles.Length > 1000)
                 {
                     b = 0;
-                    string[] newShortList=new string[1000];
                     for (int i = 0; i < myNewFiles.Length; i=i+1000)
                     {
-                     //   myNewFiles.CopyTo(newShortList, i);
-                        Array.Copy(myNewFiles,i, newShortList, 0,1000);
-                        b += MergePDFs(newShortList, System.IO.Path.Combine(myDir, $"Index_{item}_{i}.pdf"));
+                        string[] newShortList=new string[Math.Min(1000, myNewFiles.Length - i)];
+                        //   myNewFiles.CopyTo(newShortList, i);
+                        Array.Copy(myNewFiles,i, newShortList, 0,Math.Min(1000, myNewFiles.Length-i));
+                        b += MergePDFs(newShortList, System.IO.Path.Combine(myDir, $"Index_{item}_{i}_{i+ Math.Min(1000, myNewFiles.Length - i)}.pdf"));
 
                     }
                 }
                 else
                 {
-                    b = MergePDFs(myNewFiles, System.IO.Path.Combine(myDir, $"Index_{item}.pdf"));
+                    b = MergePDFs(myNewFiles, System.IO.Path.Combine(myDir, $"Index_{item}_0_{myNewFiles.Length}.pdf"));
 
                 }
 
 				Console.WriteLine ("   "+item+Environment.NewLine);
 				a += b;
 			}
-			Console.WriteLine ("\r\nСобрали {1} файлов. Отделений связи: {0}  ",Indexes.Length-1,a);
+			Console.WriteLine ("\r\nСобрали {1} квитанций. Отделений связи: {0}  ",Indexes.Length-1,a);
 			string[] myIndexFiles=Directory.GetFiles (myDir,"*.pdf");
-			int pages = 0;
+
+		/*	
+         
+            int pages = 0;
 			int total = 0;
+
 			foreach (var iFile in myIndexFiles) 
 			{
 				using (PdfReader reader = new PdfReader (iFile)) 
@@ -78,7 +82,10 @@ namespace SortIndex
 				total += pages;
 			}
 			Console.WriteLine ("Обработано всего {0}",total);
-			//Console.ReadKey();
+
+        */
+		//Console.ReadKey();
+
 		}
 		public static int MergePDFs(string[] fileNames, string targetPdf)
 		{
@@ -86,7 +93,6 @@ namespace SortIndex
             if(fileNames.Length==0)
             {
                 return 0;
-
             }
 
 			using (FileStream stream = new FileStream(targetPdf, FileMode.Create))
